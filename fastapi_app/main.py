@@ -11,16 +11,31 @@ from asgiref.sync import sync_to_async
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent
+
+STATIC_DIR = BASE_DIR / "static"
+TEMPLATES_DIR = BASE_DIR / "templates"
 
 
 
 
-# Django ORM Setup
-sys.path.append("../db_core")
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "db_core.settings")
+sys.path.append("/app")
+
+# ✅ Set environment variable BEFORE anything uses it
+os.environ["DJANGO_SETTINGS_MODULE"] = "db_core.db_core.settings"
+
+# Optional debug print
+import pprint
+print("=== sys.path ===")
+pprint.pprint(sys.path)
+print("=== DJANGO_SETTINGS_MODULE ===", os.environ.get("DJANGO_SETTINGS_MODULE"))
+
+# ✅ Now safe to import Django
+import django
 django.setup()
 
-from authusers.models import OktaUser
+from db_core.authusers.models import OktaUser
 
 # Load secrets from .env or hardcode here for POC
 config = Config(environ={
@@ -32,8 +47,8 @@ config = Config(environ={
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="!secret")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 oauth = OAuth(config)
 oauth.register(

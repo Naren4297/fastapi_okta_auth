@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: fastapi_okta_app
+    ports:
+      - "8101:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=db_core.settings
+    restart: unless-stopped

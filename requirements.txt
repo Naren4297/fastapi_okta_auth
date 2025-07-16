@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+django
+authlib
+python-dotenv
+itsdangerous
+jinja2
+httpx
